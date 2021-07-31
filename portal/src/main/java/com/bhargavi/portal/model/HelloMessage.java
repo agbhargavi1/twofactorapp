@@ -18,3 +18,4 @@ public class HelloMessage {
 		this.name = name;
 	}
 }
+
