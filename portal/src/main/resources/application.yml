@@ -5,6 +5,6 @@ server:
     port: 443
     ssl:
       key-store: classpath:keystore.p12
-      key-store-password: amaramar
+      key-store-password: password
       keyStoreType: PKCS12
       keyAlias: tomcat
