@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Welcome page</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+  <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+  <script src="/app.js"></script>
+  <script>
+  
+	$(document).ready(function() {
+		
+		if(sessionStorage.access_token) {
+			$("#firstName").html(sessionStorage.firstName);
+			$("#lastName").html(sessionStorage.lastName);
+			
+			
+			  $("#logoutBtn").click(function (event) {
+				    $.ajax({
+				      type: "POST",
+				      url: "/logout?isDeleteEntry=true",
+				      beforeSend: function (xhr) {
+				    	    xhr.setRequestHeader ("Authorization", sessionStorage.access_token);
+				    	},
+				    }).done(function (data) {
+				    	sessionStorage.clear();
+				     	document.location.href="/";
+				    }).fail(function (jqXHR, textStatus) {
+				    	sessionStorage.clear();
+			    		document.location.href="/";
+					});
+				    event.preventDefault();
+				  });
+			} else {
+				document.location.href="index";
+			}
+		  
+	});
+</script>
+
+</head>
+<body>
+
+<div class="container-fluid" style="margin-top: 200px">
+  <div class="row">
+    <div class="col">&nbsp;</div>
+    <div class="col">
+      <h1>Welcome</h1>
+			<p id="firstName"></p>
+				<p id="lastName"></p>
+				<button type="button" id="logoutBtn" class="btn btn-link">Logout</button>
+    
+  </div>
+      
+    </div>
+    <div class="col">&nbsp;</div>
+  </div>
+
+
+
+
+
+  
+</body>
+</html>

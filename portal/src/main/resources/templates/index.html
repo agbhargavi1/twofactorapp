@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Login</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+   $(document).ready(function () {
+	   
+	   if(!sessionStorage.access_token) {
+	   
+	   $("#registerBtn").click(function (event) {
+		   document.location.href="register";
+		  });
+	   
+	   
+	   $("#logout").click(function (event) {
+		    $.ajax({
+		      type: "POST",
+		      url: "/cancel",
+		    }).done(function (data) {
+		     	document.location.href="/";
+		    });
+		    event.preventDefault();
+		  });
+	   
+	   
+	   $("#continue").click(function (event) {
+		    $.ajax({
+		      type: "POST",
+		      url: "/proceed",
+		    }).done(function (data) {
+		    	sessionStorage.access_token = "Bearer "+data.access_token;
+		    	sessionStorage.firstName = data.firstName;
+		    	sessionStorage.lastName = data.lastName;
+		    	sessionStorage.userName = data.userName;
+		    	sessionStorage.previousToken = data.previousToken;
+		    	sessionStorage.jti = data.jti;
+		     	document.location.href="dashboard";
+		    });
+		    event.preventDefault();
+		  });
+	   
+	   
+	   $("#verify").click(function (event) {
+
+			  $("#otpFormError").hide();
+			 
+			  $("#otp").focus();
+		    var otpVal = $("#otp").val();
+		    
+
+		    otpVal = $.trim(otpVal);
+
+		    if(otpVal) {
+		      var formData = {
+			  otp: otpVal
+		    };
+		    $.ajax({
+		      type: "POST",
+		      url: "/validateOTP",
+		      data: JSON.stringify(formData),
+		      dataType: "json",
+		      contentType: 'application/json',
+		    }).done(function (data) {
+		    	sessionStorage.access_token = "Bearer "+data.access_token;
+		    	sessionStorage.firstName = data.firstName;
+		    	sessionStorage.lastName = data.lastName;
+		    	sessionStorage.userName = data.userName;
+		    	sessionStorage.previousToken = data.previousToken;
+		    	sessionStorage.jti = data.jti;
+		    	document.location.href="dashboard";
+		      
+		    }).fail(function (jqXHR, textStatus) {
+		    	 if(jqXHR.responseJSON.errorMessage=='You have more than one session active') {
+		    		 $('#Modal').modal('hide');
+		    		 $('#ModalDiv').modal('show');
+		    	 } else {
+		    		 $("#otpFormError").show();
+			    	 $("#otpFormError").html(jqXHR.responseJSON.errorMessage);
+		    	 }
+		    	 
+		});;
+		    event.preventDefault();
+		    } else {
+		    	$("#otpFormError").show();
+		    
+		      $("#otpFormError").html('Please provide OTP');
+		    }
+		  });
+	   
+	   
+ 
+  $("#submit").click(function (event) {
+
+	  $("#loginFormError").hide();
+	 
+    
+    var userNamVal = $("#userName").val();
+    var password = $("#password").val();
+
+    userNamVal = $.trim(userNamVal);
+
+    if(userNamVal && password) {
+      var formData = {
+	  username: userNamVal,
+      password: password
+    };
+    $.ajax({
+      type: "POST",
+      url: "/login",
+      data: JSON.stringify(formData),
+      dataType: "json",
+      contentType: 'application/json',
+    }).done(function (data) {
+    	$("#loginFormError").hide();
+      if(data.message=='collectOTP') {
+    	  console.log('success');
+    	  $('#Modal').modal('show');
+      }
+    }).fail(function (jqXHR, textStatus) {
+    	 
+    	 if(jqXHR.responseJSON.errorMessage=='Current Session, waiting for OTP') {
+    		 
+    		 $('#Modal').modal('show');
+    	 } else {
+    		 $("#loginFormError").show();
+    		 $("#loginFormError").html(jqXHR.responseJSON.errorMessage);
+    	 }
+});;
+    event.preventDefault();
+    } else {
+    	$("#loginFormError").show();
+    	$("#userName").focus();
+    	$("#loginFormError").html('Please provide both Email ID and Password');
+    }
+  });
+	   } else {
+		   document.location.href="dashboard";
+	   }
+});
+    </script>
+</head>
+<body>
+
+<div class="container-fluid" style="margin-top: 200px">
+  <div class="row">
+    <div class="col">&nbsp;</div>
+    <div class="col">
+      <h1>Login</h1>
+  <div class="alert alert-danger" id="loginFormError" style="display:none;">
+    
+  </div>
+      <form>
+        <div class="form-group">
+          <label for="userName">Email ID:</label>
+          <input type="text" class="form-control" id="userName" name="userName" autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" class="form-control" id="password" name="password">
+        </div>
+
+        <div class="row">
+        <div class="col" style="padding-top:12px;">
+          <button type="button" id="registerBtn" class="btn btn-link">New User?</button>
+          </div>
+
+          <div class="col">
+            
+            </div>
+          <div class="col" style="text-align:right;">
+            <button type="button" id="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+       
+        
+      </form>
+    </div>
+    <div class="col">&nbsp;</div>
+  </div>
+</div>
+
+
+
+<!-- The Modal -->
+  <div class="modal fade" id="Modal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Two Factor Authentication</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="alert alert-danger" id="otpFormError" style="display:none;"></div>
+          <div class="form-group">
+  <label for="otp">Please enter your OTP: </label>
+  <input type="text" class="form-control" id="otp" name="otp">
+</div>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" id="verify" class="btn btn-primary">Verify</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+  <div class="modal fade" id="ModalDiv">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Multiple Logins</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+          <p>More than one session is active. Please click "Continue" to logout all previous session.</p>
+          <p>Please click "Logout" the current session.</p>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" id="logout" class="btn btn-primary">Logout</button>
+          <button type="button" id="continue" class="btn btn-primary">Continue</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>

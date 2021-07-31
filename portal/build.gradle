@@ -1,0 +1,75 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath('se.transmode.gradle:gradle-docker:1.2') 
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'docker'
+
+group = 'gcr.io/2faapp'
+
+if(hasProperty('cmdGroup')) { 
+    group = cmdGroup 
+}
+
+
+
+project.version=1.0
+
+sourceCompatibility = '1.8'
+
+task copyJar(type: Copy) {
+    dependsOn   'build'
+    from        "build/libs/portal-${project.version}.jar"
+    into        'build/docker'
+}
+
+task buildDocker(type: Docker, dependsOn: copyJar) {
+    baseImage "openjdk:8u151"
+    exposePort 443
+    runCommand("mkdir portal")
+    addFile("portal-${project.version}.jar","portal/")
+    workingDir("/portal")
+    runCommand("unzip -q portal-${project.version}.jar")
+    entryPoint(["java","-XX:+UnlockExperimentalVMOptions","-XX:+UseCGroupMemoryLimitForHeap","-XX:MaxRAMFraction=1","-XshowSettings:vm","-Djdk.tls.rejectClientInitiatedRenegotiation=true","-cp", "/portal-config:.","org.springframework.boot.loader.JarLauncher"])
+}
+
+
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+	set('springCloudVersion', 'Greenwich.RELEASE')
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.webjars:webjars-locator-core'
+	implementation 'org.webjars:sockjs-client:1.0.2'
+	implementation 'org.webjars:stomp-websocket:2.3.3'
+	implementation 'org.webjars:bootstrap:3.3.7'
+	implementation 'org.webjars:jquery:3.1.1-1'
+
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}

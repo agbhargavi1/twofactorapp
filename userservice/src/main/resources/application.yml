@@ -1,0 +1,25 @@
+spring:
+    application:
+        name: userservice
+    datasource:
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: "jdbc:mysql://scdb:3306/userservice?autoreconnect=true"
+        password: "root"
+        username: "root"
+        testOnBorrow: true
+        testWhileIdle: true
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 30000
+        validationQuery: SELECT 1
+        max-active: 15
+        max-idle: 10
+        max-wait: 8000
+      
+server:
+    port: 8082
+
+security:
+    oauth2:
+        resource:
+            jwt:
+                key-value: -----BEGIN PUBLIC KEY-----MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsY9wY6rwdql0GCPFxu7eEypLC8TkDQHgaFlmP5QBf7Il4/8/ogTrT1cLF/fMrfhoJrPeZWjzP6NmaxttCUcki8JSbmaxdYNnIPHsPFvqr1DlpvikdKiG5lkKS27E9uUQ1XmeXh9Vhn9QwLQyXl5bbbjlDewiCzB/MuKlbuuxFsb7ZPpBD+rE69efUfTu8dZPa5QzTugqxqAe9q2soLPxYyh91BGjVGWMN9wwWnM+WaQ9IehuQko7drlvJRVhPow9zvzTanaJckn02+Ubj5+LFQ8yYNe/PQQSS+noaQtmCqRfVhL161F6yivj16EuYJhkUn3TQQTbDhSU3CcdMcX5lQIDAQAB-----END PUBLIC KEY-----

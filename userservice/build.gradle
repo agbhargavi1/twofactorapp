@@ -1,0 +1,66 @@
+buildscript {
+	ext {
+		springBootVersion = '2.1.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath('se.transmode.gradle:gradle-docker:1.2') 
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'docker'
+
+group = 'gcr.io/2faapp'
+
+if(hasProperty('cmdGroup')) { 
+    group = cmdGroup 
+}
+
+project.version=1.0
+
+sourceCompatibility = '1.8'
+
+task copyJar(type: Copy) {
+    dependsOn   'build'
+    from        "build/libs/userservice-${project.version}.jar"
+    into        'build/docker'
+}
+
+task buildDocker(type: Docker, dependsOn: copyJar) {
+    baseImage "openjdk:8u151"
+    exposePort 443
+    runCommand("mkdir userservice")
+    addFile("userservice-${project.version}.jar","userservice/")
+    workingDir("/userservice")
+    runCommand("unzip -q userservice-${project.version}.jar")
+    entryPoint(["java","-XX:+UnlockExperimentalVMOptions","-XX:+UseCGroupMemoryLimitForHeap","-XX:MaxRAMFraction=1","-XshowSettings:vm","-Djdk.tls.rejectClientInitiatedRenegotiation=true","-cp", "/userservice-config:.","org.springframework.boot.loader.JarLauncher"])
+}
+
+repositories {
+	mavenCentral()
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+	set('springCloudVersion', 'Greenwich.RELEASE')
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.cloud:spring-cloud-starter-oauth2'
+	runtimeOnly 'mysql:mysql-connector-java'
+
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}

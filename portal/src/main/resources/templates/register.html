@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Login</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+  $(document).ready(function () {
+	  
+
+	  if(!sessionStorage.access_token) {
+	  
+	   $("#loginBtn").click(function (event) {
+		   document.location.href="index";
+		  });
+	   
+	   
+	   $("#submit").click(function (event) {
+
+			  $("#registerformError").hide();
+			  $("#registerformSuccess").hide();
+			  $("#registerformError").html('');
+			  $("#registerformSuccess").html('');
+			  
+		    var firstName =  $("#firstName").val();
+		    var lastName = $("#lastName").val();
+		    var userNamVal = $("#userName").val();
+		    var password = $("#password").val();
+
+		    userNamVal = $.trim(userNamVal);
+
+		    if(userNamVal && password && firstName && lastName) {
+		      var formData = {
+			  username: userNamVal,
+		      password: password,
+		      firstName: firstName,
+		      lastName: lastName
+		    };
+		    $.ajax({
+		      type: "POST",
+		      url: "/formregister",
+		      data: JSON.stringify(formData),
+		      dataType: "json",
+		      contentType: 'application/json'
+		    }).done(function (data) {
+		    	$("#registerformError").hide();
+		    	$("#registerformSuccess").show();
+		    	$("#registerformSuccess").html('User registered successfully!');
+		    }).fail(function (jqXHR, textStatus) {
+		    	 
+		    	$("#registerformError").show();
+		    	$("#registerformSuccess").hide();
+		    	
+		    	
+		    		 $("#registerformError").html(jqXHR.responseJSON.errorMessage);
+		    	
+		});
+		    event.preventDefault();
+		    } else {
+		
+		    	$("#registerformError").show();
+		    	$("#registerformError").html('Please fill up all the fields');
+		    }
+		  });
+	   
+	  } else {
+		  document.location.href="dashboard";
+	  }
+	   
+  });
+  </script>
+</head>
+<body>
+
+<div class="container-fluid" style="margin-top: 200px">
+  <div class="row">
+    <div class="col">&nbsp;</div>
+    <div class="col">
+      <h1>New User Register</h1>
+      <p>Please use unique Email ID for your testing</p>
+  <div class="alert alert-danger" id="registerformError" style="display:none;">  </div>
+  <div class="alert alert-success" id="registerformSuccess" style="display:none;">  </div>
+    
+
+      <form>
+      <div class="form-group">
+          <label for="firstName">First Name:</label>
+          <input type="text" class="form-control" id="firstName" name="firstName" autofocus maxlength="15">
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name:</label>
+          <input type="text" class="form-control" id="lastName" name="lastName" maxlength="15">
+        </div>
+        <div class="form-group">
+          <label for="userName">Email ID:</label>
+          <input type="text" class="form-control" id="userName" name="userName">
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" class="form-control" id="password" name="password" maxlength="15">
+        </div>
+
+        <div class="row">
+        <div class="col" style="padding-top:12px;">
+          <button type="button" id="loginBtn" class="btn btn-link">Login</button>
+          </div>
+
+          <div class="col">
+            
+            </div>
+          <div class="col" style="text-align:right;">
+            <button type="button" id="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </div>
+       
+        
+      </form>
+    </div>
+    <div class="col">&nbsp;</div>
+  </div>
+</div>
+
+</div>
+
+</div>
+  
+</body>
+</html>
