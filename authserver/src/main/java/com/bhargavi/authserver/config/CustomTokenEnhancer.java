@@ -65,11 +65,11 @@ public class CustomTokenEnhancer extends JwtAccessTokenConverter {
 		try {
 			Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
-					return new PasswordAuthentication("agbhargavi1@gmail.com", "agiee#2021");
+					return new PasswordAuthentication("userid", "password");
 				}
 			});
 			Message msg = new MimeMessage(session);
-			msg.setFrom(new InternetAddress("agbhargavi1@gmail.com", false));
+			msg.setFrom(new InternetAddress("userid", false));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmailAddress));
 			msg.setSubject("OTP from Portal");
 			otp = ""+ThreadLocalRandom.current().nextInt(999, 9999 + 1);
