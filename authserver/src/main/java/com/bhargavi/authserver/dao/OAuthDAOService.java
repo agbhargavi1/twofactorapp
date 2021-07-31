@@ -9,3 +9,4 @@ public interface OAuthDAOService {
 	public abstract String updateAndGetActiveSessions(String username);
 
 }
+
