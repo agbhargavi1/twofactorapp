@@ -29,6 +29,3 @@ setTimeout(function(){
 
 if(sessionStorage.previousToken) {
 stompClient.send("/app/hello", {}, JSON.stringify({'name': sessionStorage.previousToken}));} }, 3000);
-
-
- 
