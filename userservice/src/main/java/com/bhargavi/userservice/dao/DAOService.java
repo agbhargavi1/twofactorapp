@@ -10,3 +10,4 @@ public interface DAOService {
 	public void updateCurrentToken(String userName, String access_token);
 	public void register(Login login);
 }
+
