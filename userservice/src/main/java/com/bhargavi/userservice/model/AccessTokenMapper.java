@@ -56,5 +56,4 @@ public class AccessTokenMapper {
 	public void setPreviousToken(String previousToken) {
 		this.previousToken = previousToken;
 	}
-
 }
