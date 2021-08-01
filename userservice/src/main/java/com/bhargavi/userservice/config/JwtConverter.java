@@ -42,3 +42,4 @@ public class JwtConverter extends DefaultAccessTokenConverter implements JwtAcce
 		return auth;
 	}
 }
+
